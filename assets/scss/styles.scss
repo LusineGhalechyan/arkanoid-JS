@@ -1,4 +1,10 @@
 body {
-    text-align: center;
     padding: 1%;
+    .canvas{
+        background-color:  #f1f1f1;        
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+    }
 }
