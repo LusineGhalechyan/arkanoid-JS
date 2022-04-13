@@ -1,17 +1,17 @@
 function Arkanoid(selector, rowBricks) {
   this.selector = selector;
   this.rowBricks = rowBricks;
-  this.start();
-  this.generateDrawRandomBricksRow();
-  this.generateAndDrawPaddle();
-  this.generateAndDrawBall();
+  this.initCanvas();
+  this.initVals();
+
+  setInterval(this.loadGame(), 10);
 }
 
-Arkanoid.prototype.start = () => ({
+Arkanoid.prototype.initCanvas = () => ({
   canvas: document.createElement("canvas"),
-  startGame(selector) {
+  canvasProps(selector) {
     this.canvas.width = 500;
-    this.canvas.height = 500;
+    this.canvas.height = 450;
     this.canvas.classList.add(selector || arkanoid.selector);
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     return this.canvas;
@@ -31,14 +31,40 @@ Arkanoid.prototype.generateRandomNumbers = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-Arkanoid.prototype.generateDrawRandomBricksRow = function () {
-  this.rowsQty = this.generateRandomNumbers(5, 11) || this.rowBricks.rows;
-  this.bricksRow = new Array(this.rowsQty);
-  this.canvas = this.start().startGame(this.selector);
+Arkanoid.prototype.initVals = function () {
+  //init & get canvas props
+  this.height = 15;
+  this.canvas = this.initCanvas().canvasProps(this.selector);
   this.canvasWidth = this.canvas.getBoundingClientRect().width;
   this.canvasHeight = this.canvas.getBoundingClientRect().height;
   this.context = this.canvas.getContext("2d");
-  this.height = 15;
+
+  //paddle props
+  this.paddleWidth = 100;
+  this.paddleX = (this.canvasWidth - this.paddleWidth) / 2;
+
+  //ball props
+  this.ballDiameter = 10;
+  this.ballX = this.canvasWidth / 2;
+  this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
+};
+
+Arkanoid.prototype.generateAndDrawPaddle = function () {
+  this.context.beginPath();
+  this.context.rect(
+    this.paddleX,
+    this.canvasHeight - this.height,
+    this.paddleWidth,
+    this.height
+  );
+  this.context.fillStyle = this.generateRandomColor();
+  this.context.fill();
+  this.context.closePath();
+};
+
+Arkanoid.prototype.generateAndDrawRandomBricksRow = function () {
+  this.rowsQty = this.generateRandomNumbers(5, 11) || this.rowBricks.rows;
+  this.bricksRow = new Array(this.rowsQty);
 
   for (let row = 0; row < this.bricksRow.length; row++) {
     this.bricksRow[row] = new Array(this.bricksQty);
@@ -57,38 +83,48 @@ Arkanoid.prototype.generateDrawRandomBricksRow = function () {
       this.context.closePath();
     }
   }
-  console.log(`this.bricksRow`, this.bricksRow);
   return this.bricksRow;
 };
 
-Arkanoid.prototype.generateAndDrawPaddle = function () {
-  this.paddleWidth = 100;
-  var paddleX = (this.canvasWidth - this.paddleWidth) / 2;
-  this.context.beginPath();
-  this.context.rect(
-    paddleX,
-    this.canvasHeight - this.height,
-    this.paddleWidth,
-    this.height
-  );
-  this.context.fillStyle = this.generateRandomColor();
-  this.context.fill();
-  this.context.closePath();
-};
-
-Arkanoid.prototype.generateAndDrawBall = function () {
-  this.ballDiameter = 10;
-  var ballX = this.canvasWidth / 2;
-  var ballY = this.canvasHeight - (this.height + this.ballDiameter);
+Arkanoid.prototype.drawBall = function () {
   this.context.beginPath();
   this.context.arc(
-    ballX,
-    ballY,
+    this.ballX,
+    this.ballY,
     this.ballDiameter,
     0,
     Math.PI * this.ballDiameter
   );
-  this.context.fillStyle = this.generateRandomColor();
+  this.context.fillStyle = "#0000ff";
   this.context.fill();
   this.context.closePath();
+
+  // ballX += dx;
+  // ballY += dy;
 };
+
+Arkanoid.prototype.loadGame = function () {
+  this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  this.generateAndDrawPaddle();
+  this.drawBall();
+  this.generateAndDrawRandomBricksRow();
+  this.dx = 2;
+  this.dy = -2;
+
+  this.ballX += this.dx;
+  this.ballY += this.dy;
+};
+
+// console.log(this.generateAndDrawBall());
+
+Arkanoid.prototype.getMainContainerAndAddEventListener = function (
+  actionType,
+  action
+) {
+  return document
+    .querySelector(this.selector)
+    .addEventListener(actionType, action);
+};
+
+// console.log(this.getMainContainerAndAddEventListener("keydown", keyDown));
+// this.getMainContainerAndAddEventListener("keyup", keyUp);
