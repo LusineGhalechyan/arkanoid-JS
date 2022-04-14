@@ -15,6 +15,7 @@ function Arkanoid(selector, rowBricks) {
   //paddle props
   this.paddleWidth = 100;
   this.paddleX = (this.canvasWidth - this.paddleWidth) / 2;
+  this.paddleY = this.canvasHeight - this.height;
 
   //ball props
   this.dx = 2;
@@ -24,11 +25,11 @@ function Arkanoid(selector, rowBricks) {
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
 
   this.initCanvas();
-  this.generateAndDrawPaddle();
+  // this.generateAndDrawPaddle();
   // this.generateAndDrawRandomBricksRow();
-  this.loadGame();
+  // this.loadGame();
 
-  // setInterval(() => this.loadGame(), 10);
+  setInterval(() => this.loadGame(), 10);
 }
 
 Arkanoid.prototype.initCanvas = () => ({
@@ -57,13 +58,23 @@ Arkanoid.prototype.generateRandomNumbers = function (min, max) {
 
 Arkanoid.prototype.generateAndDrawPaddle = function () {
   this.context.beginPath();
-  this.context.rect(
-    this.paddleX,
-    this.canvasHeight - this.height,
-    this.paddleWidth,
-    this.height
-  );
+  this.context.rect(this.paddleX, this.paddleY, this.paddleWidth, this.height);
   this.context.fillStyle = "#B0F63C";
+  this.context.fill();
+  this.context.closePath();
+};
+
+Arkanoid.prototype.drawBall = function () {
+  this.context.beginPath();
+  this.context.arc(
+    this.ballX,
+    this.ballY,
+    this.ballDiameter,
+    0,
+    Math.PI * this.ballDiameter
+  );
+
+  this.context.fillStyle = "#0000ff";
   this.context.fill();
   this.context.closePath();
 };
@@ -73,7 +84,7 @@ Arkanoid.prototype.generateAndDrawRandomBricksRow = function () {
   for (let i = 0; i < this.rowsQty; i++) {
     this.bricksRow.push(0);
   }
-
+  console.log(this.bricksRow);
   for (let row = 0; row < this.bricksRow.length; row++) {
     this.bricksRow[row] = new Array(this.bricksQty);
     this.bricksQty =
@@ -93,31 +104,28 @@ Arkanoid.prototype.generateAndDrawRandomBricksRow = function () {
       this.context.closePath();
     }
   }
-  return this.bricksRow;
-};
-
-Arkanoid.prototype.drawBall = function () {
-  this.context.beginPath();
-  this.context.arc(
-    this.ballX,
-    this.ballY,
-    this.ballDiameter,
-    0,
-    Math.PI * this.ballDiameter
-  );
-  this.context.fillStyle = "#0000ff";
-  this.context.fill();
-  this.context.closePath();
 };
 
 Arkanoid.prototype.loadGame = function () {
   this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
   this.generateAndDrawPaddle();
   this.drawBall();
-  this.generateAndDrawRandomBricksRow();
+  // this.generateAndDrawRandomBricksRow();
 
   this.ballX += this.dx;
   this.ballY += this.dy;
+
+  if (
+    this.ballX + this.dx >= this.canvasWidth ||
+    this.ballX + this.dx - this.ballDiameter / 2 < 0
+  )
+    this.dx = -this.dx;
+
+  if (
+    this.ballY + this.dy - this.ballDiameter / 2 < 0 ||
+    this.ballY + this.dy > this.canvasHeight
+  )
+    this.dy = -this.dy;
 };
 
 Arkanoid.prototype.getMainContainerAndAddEventListener = function (
