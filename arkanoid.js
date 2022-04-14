@@ -16,10 +16,12 @@ function Arkanoid(selector, rowBricks) {
   this.paddleWidth = 100;
   this.paddleX = (this.canvasWidth - this.paddleWidth) / 2;
   this.paddleY = this.canvasHeight - this.height;
+  this.rightPressed = false;
+  this.leftPressed = false;
 
   //ball props
-  this.dx = 2;
-  this.dy = -2;
+  this.dx = 1;
+  this.dy = -1;
   this.ballDiameter = 10;
   this.ballX = this.canvasWidth / 2;
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
@@ -116,14 +118,14 @@ Arkanoid.prototype.loadGame = function () {
   this.ballY += this.dy;
 
   if (
-    this.ballX + this.dx >= this.canvasWidth ||
-    this.ballX + this.dx - this.ballDiameter / 2 < 0
+    this.ballX + this.dx + this.ballDiameter > this.canvasWidth ||
+    this.ballX + this.dx - this.ballDiameter < 0
   )
     this.dx = -this.dx;
 
   if (
-    this.ballY + this.dy - this.ballDiameter / 2 < 0 ||
-    this.ballY + this.dy > this.canvasHeight
+    this.ballY + this.dy - this.ballDiameter < 0 ||
+    this.ballY + this.dy + this.ballDiameter > this.canvasHeight
   )
     this.dy = -this.dy;
 };
