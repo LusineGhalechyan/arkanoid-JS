@@ -2,6 +2,10 @@ function Arkanoid(selector, rowBricks) {
   this.selector = selector;
   this.rowBricks = rowBricks;
 
+  //space key options
+  this.spaceKey = " ";
+  this.spaceKeyPressed = false;
+
   //get canvas props
   this.canvas = this.initCanvas().canvasProps(this.selector);
   this.canvasWidth = this.canvas.getBoundingClientRect().width;
@@ -31,13 +35,13 @@ function Arkanoid(selector, rowBricks) {
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
 
   this.initCanvas();
+  this.loadGame();
   this.addMultipleListeners();
+  console.log(`spaceKeyPressed_CLASS`, this.spaceKeyPressed);
+  // this.destroyEventListeners();
 
   // this.generateAndDrawPaddle();
   // this.generateAndDrawRandomBricksRow();
-  this.loadGame();
-
-  setInterval(() => this.loadGame(), 10);
 }
 
 Arkanoid.prototype.initCanvas = () => ({
@@ -82,6 +86,25 @@ Arkanoid.prototype.addMultipleListeners = function () {
   });
 };
 
+Arkanoid.prototype.destroyEventListeners = function () {
+  var eventsArray = [
+    // see afterwards !!!!! to make inheritance between class methods
+
+    {
+      actionType: "keydown",
+      action: (evt) => this.keyDown(evt),
+    },
+    {
+      actionType: "keyup",
+      action: (evt) => this.keyUp(evt),
+    },
+  ];
+
+  eventsArray.forEach((evtObj) => {
+    this.canvas.removeEventListener(evtObj["actionType"], evtObj["action"]);
+  });
+};
+
 Arkanoid.prototype.generateAndDrawPaddle = function () {
   this.context.beginPath();
   this.context.rect(this.paddleX, this.paddleY, this.paddleWidth, this.height);
@@ -92,6 +115,7 @@ Arkanoid.prototype.generateAndDrawPaddle = function () {
 
 Arkanoid.prototype.drawBall = function () {
   this.context.beginPath();
+  // this.context.globalAlpha = 0.3;
   this.context.arc(
     this.ballX,
     this.ballY,
@@ -102,16 +126,17 @@ Arkanoid.prototype.drawBall = function () {
 
   this.context.fillStyle = "#0000ff";
   this.context.fill();
+  // this.context.globalAlpha = 1;
   this.context.closePath();
 };
 
 Arkanoid.prototype.generateAndDrawRandomBricksRow = function () {
   this.rowsQty = this.rowBricks.rows || this.generateRandomNumbers(5, 11);
   for (let i = 0; i < this.rowsQty; i++) {
-    this.bricksRow.push(0);
+    this.bricksRow = Array(this.rowsQty);
   }
   for (let row = 0; row < this.bricksRow.length; row++) {
-    this.bricksRow[row] = new Array(this.bricksQty);
+    this.bricksRow[row] = Array(this.bricksQty);
     this.bricksQty =
       this.generateRandomNumbers(this.rowBricks.bricks, this.rowBricks.rows) ||
       this.generateRandomNumbers(3, 11);
@@ -146,11 +171,14 @@ Arkanoid.prototype.loadGame = function () {
   )
     this.dx = -this.dx;
 
-  if (
-    this.ballY + this.dy - this.ballDiameter < 0 ||
-    this.ballY + this.dy + this.ballDiameter > this.canvasHeight
-  )
-    this.dy = -this.dy;
+  if (this.ballY + this.dy - this.ballDiameter < 0) this.dy = -this.dy; // || this.ballY + this.dy + this.ballDiameter > this.canvasHeight
+
+  if (this.ballY + this.dy + this.ballDiameter > this.canvasHeight) {
+    alert(`🚫 Game is over !`);
+    clearInterval(this.gameInterval);
+    document.location.reload(); // SEE AFTERWARDS
+    // this.initCanvas().canvas;
+  }
 
   if (this.rightPressed) {
     this.paddleX += this.rightArrowVal;
@@ -168,11 +196,18 @@ Arkanoid.prototype.loadGame = function () {
 };
 
 Arkanoid.prototype.keyDown = function (evt) {
+  console.log(`spaceKeyPressed_DWN`, this.spaceKeyPressed);
+
   if (evt.key === this.rightArrowKey) this.rightPressed = true;
   if (evt.key === this.leftArrowKey) this.leftPressed = true;
+  if (evt.key === this.spaceKey && !this.spaceKeyPressed) {
+    this.spaceKeyPressed = true;
+    this.gameInterval = setInterval(() => this.loadGame(), 10);
+  }
 };
 
 Arkanoid.prototype.keyUp = function (evt) {
+  console.log(`this.gameInterval`, this.gameInterval);
   if (evt.key === this.rightArrowKey) this.rightPressed = false;
   if (evt.key === this.leftArrowKey) this.leftPressed = false;
 };
