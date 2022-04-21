@@ -36,7 +36,7 @@ function Arkanoid(selector, rowBricks) {
       this.generateRandomNumbers(3, 11);
 
     for (let brick = 0; brick < this.bricksQty; brick++) {
-      this.bricksRow[row][brick] = { x: 0, y: 0 };
+      this.bricksRow[row][brick] = { x: 0, y: 0, status: 1 };
     }
   }
 
@@ -59,8 +59,8 @@ function Arkanoid(selector, rowBricks) {
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
 
   this.initCanvas();
-  this.loadGame();
   this.drawBricks();
+  this.loadGame();
   this.addMultipleListeners();
 }
 
@@ -142,7 +142,12 @@ Arkanoid.prototype.drawBricks = function () {
 };
 
 Arkanoid.prototype.loadGame = function () {
-  this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  this.context.clearRect(
+    0,
+    this.rowsQty * this.height,
+    this.canvasWidth,
+    this.canvasHeight
+  );
   this.generateAndDrawPaddle();
   this.drawBall();
   // this.drawBricks();
@@ -165,7 +170,7 @@ Arkanoid.prototype.loadGame = function () {
     ) {
       this.dy = -this.dy;
     } else {
-      alert(`🚫 Game is over !`);
+      alert(`❗❗❗ Game is over ❗❗❗`);
       clearInterval(this.gameInterval);
       this.destroyEventListeners();
 
@@ -173,6 +178,7 @@ Arkanoid.prototype.loadGame = function () {
       // this.canvas.onload = function () {
       //   this.canvas.initCanvas().canvas;
       // };
+      // this.canvas.onload();
     }
   }
 
