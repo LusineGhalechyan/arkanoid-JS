@@ -1,13 +1,16 @@
 function Arkanoid(selector, rowBricks) {
   this.selector = selector;
   this.rowBricks = rowBricks;
-
   //get canvas props
   this.canvas = this.initCanvas().canvasProps(this.selector);
   this.canvasWidth = this.canvas.getBoundingClientRect().width;
   this.canvasHeight = this.canvas.getBoundingClientRect().height;
   this.context = this.canvas.getContext("2d");
 
+  this.initGame();
+}
+
+Arkanoid.prototype.initGame = function () {
   //space key options
   this.spaceKey = " ";
   this.spaceKeyPressed = false;
@@ -22,7 +25,18 @@ function Arkanoid(selector, rowBricks) {
       actionType: "keyup",
       action: (evt) => this.keyUp(evt),
     },
+    {
+      actionType: "reload",
+      action: (evt) => this.reLoad(evt),
+    },
   ];
+
+  this.isGameOvered = false;
+  this.event = new CustomEvent("reload", {
+    detail: {
+      isGameOvered: this.isGameOvered,
+    },
+  });
 
   //init and generate bricks
   this.height = 15;
@@ -34,7 +48,6 @@ function Arkanoid(selector, rowBricks) {
     this.bricksQty =
       this.generateRandomNumbers(this.rowBricks.bricks, this.rowBricks.rows) ||
       this.generateRandomNumbers(3, 11);
-
     this.brickWidth = parseInt(this.canvasWidth / this.bricksQty);
 
     for (let brick = 0; brick < this.bricksQty; brick++) {
@@ -59,17 +72,16 @@ function Arkanoid(selector, rowBricks) {
   this.leftArrowVal = 5;
 
   //ball props
-  this.dx = 1;
-  this.dy = -1;
+  this.dx = 2;
+  this.dy = -2;
   this.ballDiameter = 10;
   this.ballX = this.canvasWidth / 2;
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
 
   this.initCanvas();
-  // this.onLoad();
   this.loadGame();
   this.addMultipleListeners();
-}
+};
 
 Arkanoid.prototype.initCanvas = () => ({
   canvas: document.createElement("canvas"),
@@ -83,13 +95,9 @@ Arkanoid.prototype.initCanvas = () => ({
   },
 });
 
-// Arkanoid.prototype.onLoad = function () {
-//   // SEE !!!!!!!!!!!
-//   this.canvas.addEventListener("DOMContentLoaded", function () {
-//     this.canvasWidth |= 0;
-//     this.initCanvas().canvas;
-//   });
-// };
+Arkanoid.prototype.reLoad = function (evt) {
+  this.initGame();
+};
 
 Arkanoid.prototype.generateRandomColor = () => {
   var color = "#";
@@ -158,12 +166,14 @@ Arkanoid.prototype.drawBall = function () {
 };
 
 Arkanoid.prototype.drawBricks = function () {
+  // console.log(`BR`, this.bricksRow);
   for (let row = 0; row < this.rowsQty; row++) {
     for (let brick = 0; brick < this.bricksRow[row].length; brick++) {
-      if (!this.bricksRow[row][brick].status) continue;
-      var { x, y, color } = this.bricksRow[row][brick];
+      var { x, y, color, status } = this.bricksRow[row][brick];
+      if (!status) continue;
       this.context.beginPath();
       this.context.rect(x, y, this.brickWidth, this.height);
+      console.log(x, y, this.brickWidth, this.bricksQty);
       this.context.fillStyle = color;
       this.context.fill();
       this.context.closePath();
@@ -198,11 +208,8 @@ Arkanoid.prototype.loadGame = function () {
     } else {
       alert(`❗❗❗ Game is over ❗❗❗`);
       clearInterval(this.gameInterval);
+      this.canvas.dispatchEvent(this.event);
       this.destroyEventListeners();
-
-      document.location.reload(); // SEE AFTERWARDS
-
-      // Arkanoid.prototype.onLoad();
     }
   }
 
