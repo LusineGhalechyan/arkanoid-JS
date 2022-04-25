@@ -32,11 +32,7 @@ Arkanoid.prototype.initGame = function () {
   ];
 
   this.isGameOvered = false;
-  this.event = new CustomEvent("reload", {
-    detail: {
-      isGameOvered: this.isGameOvered,
-    },
-  });
+  this.event = new CustomEvent("reload");
 
   //init and generate bricks
   this.height = 15;
@@ -85,6 +81,9 @@ Arkanoid.prototype.initGame = function () {
   this.ballX = this.canvasWidth / 2;
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
 
+  //collision counts
+  this.collisionCount = 0;
+
   this.initCanvas();
   this.loadGame();
   this.addMultipleListeners();
@@ -132,9 +131,11 @@ Arkanoid.prototype.destroyEventListeners = function () {
 };
 
 Arkanoid.prototype.collisionDetection = function () {
+  var brickCount = 0;
   for (let row = 0; row < this.rowsQty; row++) {
     for (let brick = 0; brick < this.bricksRow[row].length; brick++) {
       this.brickObj = this.bricksRow[row][brick];
+      brickCount++;
       if (this.brickObj["status"]) {
         if (
           this.ballX > this.brickObj["x"] &&
@@ -144,9 +145,16 @@ Arkanoid.prototype.collisionDetection = function () {
         ) {
           this.dy = -this.dy;
           this.brickObj["status"] = 0;
+          this.collisionCount++;
         }
       }
     }
+  }
+  if (this.collisionCount === brickCount) {
+    alert(`You win 🎉🎉🎉`);
+    clearInterval(this.gameInterval);
+    this.canvas.dispatchEvent(this.event);
+    this.destroyEventListeners();
   }
 };
 
