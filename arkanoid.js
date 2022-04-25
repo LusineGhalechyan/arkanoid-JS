@@ -35,8 +35,15 @@ function Arkanoid(selector, rowBricks) {
       this.generateRandomNumbers(this.rowBricks.bricks, this.rowBricks.rows) ||
       this.generateRandomNumbers(3, 11);
 
+    this.brickWidth = parseInt(this.canvasWidth / this.bricksQty);
+
     for (let brick = 0; brick < this.bricksQty; brick++) {
-      this.bricksRow[row][brick] = { x: 0, y: 0, status: 1 };
+      this.bricksRow[row][brick] = { x: 0, y: 0, color: "", status: 1 };
+      this.brickX = brick * this.brickWidth;
+      this.brickY = row * this.height;
+      this.bricksRow[row][brick]["x"] = this.brickX;
+      this.bricksRow[row][brick]["y"] = this.brickY;
+      this.bricksRow[row][brick]["color"] = this.generateRandomColor();
     }
   }
 
@@ -59,7 +66,7 @@ function Arkanoid(selector, rowBricks) {
   this.ballY = this.canvasHeight - (this.height + this.ballDiameter);
 
   this.initCanvas();
-  this.drawBricks();
+  // this.onLoad();
   this.loadGame();
   this.addMultipleListeners();
 }
@@ -75,6 +82,14 @@ Arkanoid.prototype.initCanvas = () => ({
     return this.canvas;
   },
 });
+
+// Arkanoid.prototype.onLoad = function () {
+//   // SEE !!!!!!!!!!!
+//   this.canvas.addEventListener("DOMContentLoaded", function () {
+//     this.canvasWidth |= 0;
+//     this.initCanvas().canvas;
+//   });
+// };
 
 Arkanoid.prototype.generateRandomColor = () => {
   var color = "#";
@@ -101,6 +116,25 @@ Arkanoid.prototype.destroyEventListeners = function () {
   });
 };
 
+Arkanoid.prototype.collisionDetection = function () {
+  for (let row = 0; row < this.rowsQty; row++) {
+    for (let brick = 0; brick < this.bricksRow[row].length; brick++) {
+      this.brickObj = this.bricksRow[row][brick];
+      if (this.brickObj["status"]) {
+        if (
+          this.ballX > this.brickObj["x"] &&
+          this.ballX < this.brickObj["x"] + this.brickWidth &&
+          this.ballY > this.brickObj["y"] &&
+          this.ballY < this.brickObj["y"] + this.height
+        ) {
+          this.dy = -this.dy;
+          this.brickObj["status"] = 0;
+        }
+      }
+    }
+  }
+};
+
 Arkanoid.prototype.generateAndDrawPaddle = function () {
   this.context.beginPath();
   this.context.rect(this.paddleX, this.paddleY, this.paddleWidth, this.height);
@@ -118,7 +152,6 @@ Arkanoid.prototype.drawBall = function () {
     0,
     Math.PI * this.ballDiameter
   );
-
   this.context.fillStyle = "#0000ff";
   this.context.fill();
   this.context.closePath();
@@ -126,15 +159,12 @@ Arkanoid.prototype.drawBall = function () {
 
 Arkanoid.prototype.drawBricks = function () {
   for (let row = 0; row < this.rowsQty; row++) {
-    this.brickWidth = parseInt(this.canvasWidth / this.bricksRow[row].length);
     for (let brick = 0; brick < this.bricksRow[row].length; brick++) {
-      this.brickX = brick * this.brickWidth;
-      this.brickY = row * this.height;
-      this.bricksRow[row][brick].x = this.brickX;
-      this.bricksRow[row][brick].y = this.brickY;
+      if (!this.bricksRow[row][brick].status) continue;
+      var { x, y, color } = this.bricksRow[row][brick];
       this.context.beginPath();
-      this.context.rect(this.brickX, this.brickY, this.brickWidth, this.height);
-      this.context.fillStyle = this.generateRandomColor();
+      this.context.rect(x, y, this.brickWidth, this.height);
+      this.context.fillStyle = color;
       this.context.fill();
       this.context.closePath();
     }
@@ -142,15 +172,11 @@ Arkanoid.prototype.drawBricks = function () {
 };
 
 Arkanoid.prototype.loadGame = function () {
-  this.context.clearRect(
-    0,
-    this.rowsQty * this.height,
-    this.canvasWidth,
-    this.canvasHeight
-  );
-  this.generateAndDrawPaddle();
+  this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  this.drawBricks();
   this.drawBall();
-  // this.drawBricks();
+  this.generateAndDrawPaddle();
+  this.collisionDetection();
 
   this.ballX += this.dx;
   this.ballY += this.dy;
@@ -175,10 +201,8 @@ Arkanoid.prototype.loadGame = function () {
       this.destroyEventListeners();
 
       document.location.reload(); // SEE AFTERWARDS
-      // this.canvas.onload = function () {
-      //   this.canvas.initCanvas().canvas;
-      // };
-      // this.canvas.onload();
+
+      // Arkanoid.prototype.onLoad();
     }
   }
 
