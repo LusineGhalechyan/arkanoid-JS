@@ -51,8 +51,15 @@ Arkanoid.prototype.initGame = function () {
     this.brickWidth = parseInt(this.canvasWidth / this.bricksQty);
 
     for (let brick = 0; brick < this.bricksQty; brick++) {
-      this.bricksRow[row][brick] = { x: 0, y: 0, color: "", status: 1 };
-      this.brickX = brick * this.brickWidth;
+      this.bricksRow[row][brick] = {
+        x: 0,
+        y: 0,
+        color: "",
+        brickWidth: this.brickWidth,
+        status: 1,
+      };
+
+      this.brickX = brick * this.bricksRow[row][brick]["brickWidth"];
       this.brickY = row * this.height;
       this.bricksRow[row][brick]["x"] = this.brickX;
       this.bricksRow[row][brick]["y"] = this.brickY;
@@ -131,7 +138,7 @@ Arkanoid.prototype.collisionDetection = function () {
       if (this.brickObj["status"]) {
         if (
           this.ballX > this.brickObj["x"] &&
-          this.ballX < this.brickObj["x"] + this.brickWidth &&
+          this.ballX < this.brickObj["x"] + this.brickObj["brickWidth"] &&
           this.ballY > this.brickObj["y"] &&
           this.ballY < this.brickObj["y"] + this.height
         ) {
@@ -166,14 +173,12 @@ Arkanoid.prototype.drawBall = function () {
 };
 
 Arkanoid.prototype.drawBricks = function () {
-  // console.log(`BR`, this.bricksRow);
   for (let row = 0; row < this.rowsQty; row++) {
     for (let brick = 0; brick < this.bricksRow[row].length; brick++) {
-      var { x, y, color, status } = this.bricksRow[row][brick];
+      var { x, y, color, brickWidth, status } = this.bricksRow[row][brick];
       if (!status) continue;
       this.context.beginPath();
-      this.context.rect(x, y, this.brickWidth, this.height);
-      console.log(x, y, this.brickWidth, this.bricksQty);
+      this.context.rect(x, y, brickWidth, this.height);
       this.context.fillStyle = color;
       this.context.fill();
       this.context.closePath();
