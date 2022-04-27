@@ -1,13 +1,26 @@
+// body {
+//     padding: 1%;
+//     canvas{
+//         background-color:  #f1f1f1;        
+//         position: absolute;
+//         top: 50%;
+//         left: 50%;
+//         transform: translate(-50%, -50%); 
+//         &:focus {
+//             outline: none;  
+//         }      
+//     }
+// }
+
 body {
-    padding: 1%;
-    .canvas{
-        background-color:  #f1f1f1;        
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%); 
-        &:focus {
-            outline: none;  
-        }      
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    canvas {
+      background-color: #f1f1f1;
+      margin: 10px;
+      &:focus {
+        outline: none;
+      }
     }
-}
+  }
