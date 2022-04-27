@@ -152,10 +152,7 @@ Arkanoid.prototype.collisionDetection = function () {
     }
   }
   if (this.collisionCount === brickCount) {
-    alert(`You win 🎉🎉🎉`);
-    clearInterval(this.gameInterval);
-    this.canvas.dispatchEvent(this.event);
-    this.destroyEventListeners();
+    this.completingGame(`You win 🎉🎉🎉`);
   }
 };
 
@@ -221,10 +218,7 @@ Arkanoid.prototype.loadGame = function () {
       this.dy = -this.dy;
     } else {
       if (this.ballY + this.dy + this.ballDiameter > this.canvasHeight) {
-        alert(`❗❗❗ Game is over ❗❗❗`);
-        clearInterval(this.gameInterval);
-        this.canvas.dispatchEvent(this.event);
-        this.destroyEventListeners();
+        this.completingGame(`❗❗❗ Game is over ❗❗❗`);
       }
     }
   }
@@ -256,4 +250,11 @@ Arkanoid.prototype.keyDown = function (evt) {
 Arkanoid.prototype.keyUp = function (evt) {
   if (evt.key === this.rightArrowKey) this.rightPressed = false;
   if (evt.key === this.leftArrowKey) this.leftPressed = false;
+};
+
+Arkanoid.prototype.completingGame = function (status) {
+  alert(status);
+  clearInterval(this.gameInterval);
+  this.canvas.dispatchEvent(this.event);
+  this.destroyEventListeners();
 };
