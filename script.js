@@ -1,29 +1,34 @@
-// var arkanoid = new Arkanoid("canvas", {
+var arkanoid = new Arkanoid(".test", {
+  rows: 7,
+  bricks: 4,
+});
+
+// var arkanoid = new Arkanoid(".game", {
 //   rows: 7,
 //   bricks: 4,
 // });
 
-var arkanoids = [
-  new Arkanoid("canvas", {
-    rows: 7,
-    bricks: 4,
-  }),
+// var arkanoids = [
+//   new Arkanoid("canvas", {
+//     rows: 7,
+//     bricks: 4,
+//   }),
 
-  new Arkanoid("canvas", {
-    rows: 7,
-    bricks: 4,
-  }),
+//   new Arkanoid("canvas", {
+//     rows: 7,
+//     bricks: 4,
+//   }),
 
-  new Arkanoid("canvas", {
-    rows: 7,
-    bricks: 4,
-  }),
+//   new Arkanoid("canvas", {
+//     rows: 7,
+//     bricks: 4,
+//   }),
 
-  new Arkanoid("canvas", {
-    rows: 7,
-    bricks: 4,
-  }),
-];
+//   new Arkanoid("canvas", {
+//     rows: 7,
+//     bricks: 4,
+//   }),
+// ];
 
 // document.addEventListener("keydown", (evt) => {
 //   setInterval(() => {
