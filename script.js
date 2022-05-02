@@ -3,29 +3,29 @@ var arkanoid = new Arkanoid(".test", {
   bricks: 4,
 });
 
-// var arkanoid = new Arkanoid(".game", {
-//   rows: 7,
-//   bricks: 4,
-// });
+var arkanoid = new Arkanoid(".game", {
+  rows: 20,
+  bricks: 10,
+});
 
 // var arkanoids = [
-//   new Arkanoid("canvas", {
+//   new Arkanoid(".test", {
 //     rows: 7,
 //     bricks: 4,
 //   }),
 
-//   new Arkanoid("canvas", {
-//     rows: 7,
+//   new Arkanoid(".game", {
+//     rows: 6,
 //     bricks: 4,
 //   }),
 
-//   new Arkanoid("canvas", {
-//     rows: 7,
+//   new Arkanoid(".swim", {
+//     rows: 5,
 //     bricks: 4,
 //   }),
 
-//   new Arkanoid("canvas", {
-//     rows: 7,
+//   new Arkanoid(".run", {
+//     rows: 4,
 //     bricks: 4,
 //   }),
 // ];
