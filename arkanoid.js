@@ -2,11 +2,16 @@ function Arkanoid(selector, options) {
   this.selector = selector;
 
   let defaultOptiions = {
-    // random props
+    //canvas props
+    canvasWidth: 450,
+    canvasHeight: 400,
+    tabIndex: 1000,
+
+    //random props
     rows: 11,
     bricks: 5,
 
-    // init brick & paddle height
+    //init brick & paddle height
     height: 15,
 
     //ball props
@@ -16,17 +21,20 @@ function Arkanoid(selector, options) {
 
     //paddle props
     paddleWidth: 100,
+    arrowVal: 5,
+
+    //collision counts
+    collisionCount: 0,
   };
 
   this.options = { ...options, ...defaultOptiions };
 
   //get canvas props
-  // debugger;
   this.canvas = this.initCanvas(this.selector).canvasProps(this.selector);
-  this.canvasWidth = this.canvas.getBoundingClientRect().width;
-  this.canvasHeight = this.canvas.getBoundingClientRect().height;
+  this.canvas.width = this.options.canvasWidth;
+  this.canvas.height = this.options.canvasHeight;
+  this.canvas.tabIndex = this.options.tabIndex;
   this.context = this.canvas.getContext("2d");
-  // debugger;
 
   // random color's number generating
   this.r = () => parseInt(Math.random() * 256);
@@ -69,7 +77,7 @@ Arkanoid.prototype.initGame = function () {
       this.options.bricks,
       this.options.rows
     );
-    this.brickWidth = Math.ceil(this.canvasWidth / this.bricksQty);
+    this.brickWidth = Math.ceil(this.canvas.width / this.bricksQty);
 
     for (let brick = 0; brick < this.bricksQty; brick++) {
       this.bricksRow[row][brick] = {
@@ -90,21 +98,18 @@ Arkanoid.prototype.initGame = function () {
     }
   }
 
-  //ball props
-  this.ballX = this.canvasWidth / 2;
+  //calc ball props
+  this.ballX = this.canvas.width / 2;
   this.ballY =
-    this.canvasHeight -
+    this.canvas.height -
     (3 * this.options.height + this.options.ballDiameter / 2);
 
-  //paddle props
-  this.paddleX = (this.canvasWidth - this.options.paddleWidth) / 2;
+  //calc paddle props
+  this.paddleX = (this.canvas.width - this.options.paddleWidth) / 2;
   this.paddleY =
-    this.canvasHeight - (2 * this.options.height + this.options.ballDiameter);
+    this.canvas.height - (2 * this.options.height + this.options.ballDiameter);
   this.rightPressed = false;
   this.leftPressed = false;
-
-  //collision counts
-  this.collisionCount = 0;
 
   this.initCanvas();
   this.addMultipleListeners();
@@ -114,9 +119,6 @@ Arkanoid.prototype.initGame = function () {
 Arkanoid.prototype.initCanvas = (selector) => ({
   canvas: document.querySelector(selector),
   canvasProps(selector) {
-    this.canvas.width = 450;
-    this.canvas.height = 400;
-    this.canvas.tabIndex = 1000;
     return this.canvas;
   },
 });
@@ -157,12 +159,13 @@ Arkanoid.prototype.collisionDetection = function () {
         ) {
           this.options.dy = -this.options.dy;
           this.brickObj["status"] = false;
-          this.collisionCount++;
+          this.options.collisionCount++;
         }
       }
     }
   }
-  if (this.collisionCount === brickCount) this.completingGame(`You win 🎉🎉🎉`);
+  if (this.options.collisionCount === brickCount)
+    this.completingGame(`You win 🎉🎉🎉`);
 };
 
 Arkanoid.prototype.generateAndDrawPaddle = function () {
@@ -207,7 +210,7 @@ Arkanoid.prototype.drawBricks = function () {
 };
 
 Arkanoid.prototype.loadGame = function (isInit) {
-  this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   this.drawBricks();
   this.drawBall();
   this.generateAndDrawPaddle();
@@ -216,9 +219,10 @@ Arkanoid.prototype.loadGame = function (isInit) {
   if (!isInit) {
     this.ballX += this.options.dx;
     this.ballY += this.options.dy;
+
     if (
       this.ballX + this.options.dx + this.options.ballDiameter >
-        this.canvasWidth ||
+        this.canvas.width ||
       this.ballX + this.options.dx - this.options.ballDiameter < 0
     ) {
       this.options.dx = -this.options.dx;
@@ -239,21 +243,21 @@ Arkanoid.prototype.loadGame = function (isInit) {
       }
       if (
         this.ballY + this.options.dy + this.options.ballDiameter >
-        this.canvasHeight
+        this.canvas.height
       ) {
         this.completingGame(`❗❗❗ Game is over ❗❗❗`);
       }
     }
 
     if (this.rightPressed) {
-      this.paddleX += 5;
-      if (this.paddleX > this.canvasWidth - this.options.paddleWidth) {
-        this.paddleX = this.canvasWidth - this.options.paddleWidth;
+      this.paddleX += this.options.arrowVal;
+      if (this.paddleX > this.canvas.width - this.options.paddleWidth) {
+        this.paddleX = this.canvas.width - this.options.paddleWidth;
       }
     }
 
     if (this.leftPressed) {
-      this.paddleX -= 5;
+      this.paddleX -= this.options.arrowVal;
       if (this.paddleX < 0) {
         this.paddleX = 0;
       }
@@ -279,6 +283,7 @@ Arkanoid.prototype.keyUp = function (evt) {
 
 Arkanoid.prototype.completingGame = function (status) {
   alert(status);
+  cancelAnimationFrame(this.stopLoading);
   this.canvas.dispatchEvent(this.event);
   this.destroyEventListeners();
 };
