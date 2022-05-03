@@ -8,8 +8,8 @@ function Arkanoid(selector, options) {
     tabIndex: 1000,
 
     //random props
-    rows: 11,
-    bricks: 5,
+    // rows: 11,
+    // bricks: 5,
 
     //init brick & paddle height
     height: 15,
@@ -22,9 +22,6 @@ function Arkanoid(selector, options) {
     //paddle props
     paddleWidth: 100,
     arrowVal: 5,
-
-    //collision counts
-    collisionCount: 0,
   };
 
   this.options = { ...options, ...defaultOptiions };
@@ -111,6 +108,9 @@ Arkanoid.prototype.initGame = function () {
   this.rightPressed = false;
   this.leftPressed = false;
 
+  //collision counts
+  this.collisionCount = 0;
+
   this.initCanvas();
   this.addMultipleListeners();
   this.loadGame(true);
@@ -159,13 +159,12 @@ Arkanoid.prototype.collisionDetection = function () {
         ) {
           this.options.dy = -this.options.dy;
           this.brickObj["status"] = false;
-          this.options.collisionCount++;
+          this.collisionCount++;
         }
       }
     }
   }
-  if (this.options.collisionCount === brickCount)
-    this.completingGame(`You win 🎉🎉🎉`);
+  if (this.collisionCount === brickCount) this.completingGame(`You win 🎉🎉🎉`);
 };
 
 Arkanoid.prototype.generateAndDrawPaddle = function () {
