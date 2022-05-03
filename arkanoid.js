@@ -8,8 +8,8 @@ function Arkanoid(selector, options) {
     tabIndex: 1000,
 
     //random props
-    // rows: 11,
-    // bricks: 5,
+    randomRows: 11,
+    randomBricks: 5,
 
     //init brick & paddle height
     height: 15,
@@ -25,6 +25,7 @@ function Arkanoid(selector, options) {
   };
 
   this.options = { ...options, ...defaultOptiions };
+  console.log(``, this.options.rows);
 
   //get canvas props
   this.canvas = this.initCanvas(this.selector).canvasProps(this.selector);
@@ -64,15 +65,15 @@ Arkanoid.prototype.initGame = function () {
   //init and generate bricks
   this.bricksRow = [];
   this.rowsQty = this.generateRandomNumbers(
-    this.options.bricks,
-    this.options.rows
+    this.options.bricks || this.options.randomBricks,
+    this.options.rows || this.options.randomRows
   );
 
   for (let row = 0; row < this.rowsQty; row++) {
     this.bricksRow[row] = [];
     this.bricksQty = this.generateRandomNumbers(
-      this.options.bricks,
-      this.options.rows
+      this.options.bricks || this.options.randomBricks,
+      this.options.rows || this.options.randomRows
     );
     this.brickWidth = Math.ceil(this.canvas.width / this.bricksQty);
 
