@@ -1,10 +1,11 @@
 var arkanoid = new Arkanoid(".test", {
   rows: 7,
   bricks: 4,
+  // canvasWidth: 500
 });
 
 var arkanoid = new Arkanoid(".game", {
-  rows: 20,
+  rows: 10,
   bricks: 10,
 });
 
