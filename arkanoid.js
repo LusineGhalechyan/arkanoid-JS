@@ -65,6 +65,7 @@ Arkanoid.prototype.initGame = function () {
     this.bricksRow[row] = [];
     var bricksQty = this.r(bricks, rows);
     var brickWidth = Math.ceil(this.canvas.width / bricksQty);
+
     for (let brick = 0; brick < bricksQty; brick++) {
       this.bricksRow[row][brick] = {
         x: 0,
@@ -178,6 +179,55 @@ Arkanoid.prototype.drawBricks = function () {
   }
 };
 
+Arkanoid.prototype.move = function () {
+  this.ballX += this.options.dx;
+  this.ballY += this.options.dy;
+
+  if (
+    this.ballX + this.options.dx + this.options.ballDiameter >
+      this.canvas.width ||
+    this.ballX + this.options.dx - this.options.ballDiameter < 0
+  ) {
+    this.options.dx = -this.options.dx;
+  }
+
+  if (this.ballY + this.options.dy - this.options.ballDiameter < 0) {
+    this.options.dy = -this.options.dy;
+  } else if (
+    this.ballY + this.options.dy + this.options.ballDiameter >
+    this.paddleY
+  ) {
+    if (
+      this.ballX > this.paddleX &&
+      this.ballX + this.options.dx < this.paddleX + this.options.paddleWidth
+      // && this.ballY + this.options.height - this.paddleY === 5
+    ) {
+      this.options.dy = -this.options.dy;
+    }
+    if (
+      this.ballY + this.options.dy + this.options.ballDiameter >
+      this.canvas.height
+    ) {
+      this.completingGame(`❗❗❗ Game is over ❗❗❗`);
+    }
+  }
+
+  if (this.rightPressed) {
+    this.paddleX += this.options.arrowVal;
+    if (this.paddleX > this.canvas.width - this.options.paddleWidth) {
+      this.paddleX = this.canvas.width - this.options.paddleWidth;
+    }
+  }
+
+  if (this.leftPressed) {
+    this.paddleX -= this.options.arrowVal;
+    if (this.paddleX < 0) {
+      this.paddleX = 0;
+    }
+  }
+  this.stopLoading = requestAnimationFrame(() => this.loadGame(false));
+};
+
 Arkanoid.prototype.loadGame = function (isInit) {
   this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   this.drawBricks();
@@ -186,52 +236,7 @@ Arkanoid.prototype.loadGame = function (isInit) {
   this.collisionDetection();
 
   if (!isInit) {
-    this.ballX += this.options.dx;
-    this.ballY += this.options.dy;
-
-    if (
-      this.ballX + this.options.dx + this.options.ballDiameter >
-        this.canvas.width ||
-      this.ballX + this.options.dx - this.options.ballDiameter < 0
-    ) {
-      this.options.dx = -this.options.dx;
-    }
-
-    if (this.ballY + this.options.dy - this.options.ballDiameter < 0) {
-      this.options.dy = -this.options.dy;
-    } else if (
-      this.ballY + this.options.dy + this.options.ballDiameter >
-      this.paddleY
-    ) {
-      if (
-        this.ballX > this.paddleX &&
-        this.ballX + this.options.dx < this.paddleX + this.options.paddleWidth
-        // && this.ballY + this.options.height - this.paddleY === 5
-      ) {
-        this.options.dy = -this.options.dy;
-      }
-      if (
-        this.ballY + this.options.dy + this.options.ballDiameter >
-        this.canvas.height
-      ) {
-        this.completingGame(`❗❗❗ Game is over ❗❗❗`);
-      }
-    }
-
-    if (this.rightPressed) {
-      this.paddleX += this.options.arrowVal;
-      if (this.paddleX > this.canvas.width - this.options.paddleWidth) {
-        this.paddleX = this.canvas.width - this.options.paddleWidth;
-      }
-    }
-
-    if (this.leftPressed) {
-      this.paddleX -= this.options.arrowVal;
-      if (this.paddleX < 0) {
-        this.paddleX = 0;
-      }
-    }
-    this.stopLoading = requestAnimationFrame(() => this.loadGame(false));
+    this.move();
   }
 };
 
